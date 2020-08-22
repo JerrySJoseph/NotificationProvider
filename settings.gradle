@@ -1,0 +1,4 @@
+include ':NotificationProviderModule'
+include ':app:NotiificationProvider'
+include ':app'
+rootProject.name = "NotificationProvider"
