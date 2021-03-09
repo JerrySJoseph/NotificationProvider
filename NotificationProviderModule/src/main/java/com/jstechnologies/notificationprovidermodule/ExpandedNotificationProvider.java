@@ -38,10 +38,13 @@ public class ExpandedNotificationProvider {
     List<String>inboxLines= new ArrayList<>();
     Bitmap largeIcon;
     String replyname="user";
+    NotificationManager notificationManager ;
+    int importance = NotificationManager.IMPORTANCE_HIGH;
 
     public ExpandedNotificationProvider(Context context, ExpandedNotificationType type) {
         this.context = context;
         this.type = type;
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public ExpandedNotificationProvider setChannelName(String channelName) {
@@ -63,6 +66,12 @@ public class ExpandedNotificationProvider {
         this.channelID = channelID;
         return this;
     }
+
+    public ExpandedNotificationProvider setImportance(int importance) {
+        this.importance = importance;
+        return this;
+    }
+
     public ExpandedNotificationProvider addActionButton(NotificationCompat.Action action) {
         this.actions.add(action);
         return this;
@@ -110,10 +119,9 @@ public class ExpandedNotificationProvider {
         this.autocancel = autocancel;
         return this;
     }
-    public void show()
+
+    private Notification buildNotification()
     {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        int importance = NotificationManager.IMPORTANCE_HIGH;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
                     channelID, channelName, importance);
@@ -134,12 +142,12 @@ public class ExpandedNotificationProvider {
             case BIG_TEXT:mBuilder.setStyle(new NotificationCompat.BigTextStyle()
                     .bigText(bigText));break;
             case INBOX: NotificationCompat.InboxStyle obj=new NotificationCompat.InboxStyle();
-                        for(String line:inboxLines)
-                        {
-                            obj.addLine(line);
-                        }
-                        mBuilder.setStyle(obj);
-                        break;
+                for(String line:inboxLines)
+                {
+                    obj.addLine(line);
+                }
+                mBuilder.setStyle(obj);
+                break;
             case MESSAGE:NotificationCompat.MessagingStyle obj1=new NotificationCompat.MessagingStyle(replyname);
                 for(NotificationCompat.MessagingStyle.Message line:messages)
                 {
@@ -151,7 +159,15 @@ public class ExpandedNotificationProvider {
         if(actions!=null && actions.size()>0)
             for(NotificationCompat.Action action:actions)
                 mBuilder.addAction(action);
+            return mBuilder.build();
+    }
 
-        notificationManager.notify(NotificationIDManager.getnotificationID(), mBuilder.build());
+    public Notification getNotificationInstance()
+    {
+        return buildNotification();
+    }
+    public void show()
+    {
+        notificationManager.notify(NotificationIDManager.getnotificationID(), buildNotification());
     }
 }

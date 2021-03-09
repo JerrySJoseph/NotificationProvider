@@ -23,10 +23,11 @@ public class NotificationProvider {
     Intent intent;
     boolean autocancel=false;
     List<NotificationCompat.Action>actions=new ArrayList<>();
-
+    NotificationManager notificationManager;
+    int importance = NotificationManager.IMPORTANCE_HIGH;
     public NotificationProvider(Context context) {
         this.context = context;
-
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     public NotificationProvider setChannelName(String channelName) {
@@ -62,14 +63,18 @@ public class NotificationProvider {
         return this;
     }
 
+    public NotificationProvider setImportance(int importance)
+    {
+        this.importance=importance;
+        return this;
+    }
+
     public NotificationProvider setIntent(Intent intent) {
         this.intent = intent;
         return this;
     }
-    public void show()
+    private Notification buildNotification()
     {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        int importance = NotificationManager.IMPORTANCE_HIGH;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel mChannel = new NotificationChannel(
                     channelID, channelName, importance);
@@ -94,8 +99,15 @@ public class NotificationProvider {
             );
             mBuilder.setContentIntent(resultPendingIntent);
         }
+        return mBuilder.build();
+    }
 
-
-        notificationManager.notify(NotificationIDManager.getnotificationID(), mBuilder.build());
+    public void show()
+    {
+        notificationManager.notify(NotificationIDManager.getnotificationID(), buildNotification());
+    }
+    public Notification getNotificationInstance()
+    {
+        return buildNotification();
     }
 }

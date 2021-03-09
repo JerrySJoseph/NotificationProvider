@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
                 0,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        new ExpandedNotificationProvider(this, ExpandedNotificationProvider.ExpandedNotificationType.INBOX).
+        Notification inst=new ExpandedNotificationProvider(this, ExpandedNotificationProvider.ExpandedNotificationType.INBOX).
                 setTitle("This is a notification").
                 setNotificationIcon(R.mipmap.ic_launcher).
                 setIntent(this.getIntent()).
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 setBody("Test").
                 setLargeIcon(img).
                 setImage(img).
-                show();
+                getNotificationInstance();
+        int j=0;
     }
 }
